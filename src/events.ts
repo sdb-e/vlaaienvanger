@@ -9,4 +9,8 @@ export const Ev = {
   Phase: 'vv-phase',
   /** payload: { stars: number; gained: number } */
   Stars: 'vv-stars',
+  /** payload: { tier: number } — speler kiest een vrijgespeeld voertuig */
+  SelectVehicle: 'vv-select-vehicle',
+  /** payload: { unlocked: number; selected: number } — picker verversen */
+  TiersChanged: 'vv-tiers-changed',
 } as const;

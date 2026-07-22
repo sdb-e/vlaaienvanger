@@ -18,10 +18,11 @@ export const GARDEN = { left: 1240, top: 300, right: 1660, bottom: 780 };
 
 export const DELIVERY_SPOT = { x: 1300, y: 560 };
 
+/** Iets naar links zodat ze op het scherm nooit onder de teller (rechtsboven) staan. */
 export const NPC_SPOTS: Record<'mama' | 'eleanor' | 'stephan', { x: number; y: number }> = {
-  mama: { x: 1300, y: 288 },
-  eleanor: { x: 1405, y: 283 },
-  stephan: { x: 1515, y: 288 },
+  mama: { x: 1245, y: 292 },
+  eleanor: { x: 1340, y: 286 },
+  stephan: { x: 1438, y: 292 },
 };
 
 export const COW_COUNT = 5;

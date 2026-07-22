@@ -62,6 +62,10 @@ export class Vehicle extends Phaser.GameObjects.Container {
     return this.img;
   }
 
+  get isMoving(): boolean {
+    return this.moving;
+  }
+
   private setWalkIdle(): void {
     this.ward.stop();
     this.ward.setTexture(spriteKey('ward', 'walk'));

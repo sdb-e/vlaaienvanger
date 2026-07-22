@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import { Ev } from '@/events';
 import { CounterHud } from '@/systems/CounterHud';
 import { DialogueBox } from '@/systems/DialogueBox';
+import { VehiclePicker } from '@/systems/VehiclePicker';
 import type { SfxSynth } from '@/audio/SfxSynth';
 import type { VoicePlayer } from '@/audio/VoicePlayer';
 import type { DialogueLine } from '@/types';
@@ -24,6 +25,7 @@ export class UIScene extends Phaser.Scene {
 
     this.hud = new CounterHud(this);
     this.dialogue = new DialogueBox(this, voice);
+    new VehiclePicker(this);
 
     this.add.image(38, 40, 'star').setDepth(1000);
     this.starText = this.add

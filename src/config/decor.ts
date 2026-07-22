@@ -20,6 +20,9 @@ export const DECOR_IMAGES: Record<string, string> = {
   'kruiwagen-lpc': 'assets/vendor/decor/kruiwagen-lpc.png',
   'trekker-rood': 'assets/vendor/decor/trekker-rood.png',
   'trekker-groen': 'assets/vendor/decor/trekker-groen.png',
+  raceauto: 'assets/vendor/decor/raceauto.png',
+  hotdogkar: 'assets/vendor/decor/hotdogkar.png',
+  brandweer: 'assets/vendor/decor/brandweer.png',
   'emmer-lpc': 'assets/vendor/decor/emmer-lpc.png',
   waterlelies: 'assets/vendor/decor/waterlelies.png',
 };

@@ -6,6 +6,8 @@ import { NpcChatter } from '@/systems/NpcChatter';
 import { TIERS, type VehicleTier } from '@/config/progression';
 import { SfxSynth } from '@/audio/SfxSynth';
 import { VoicePlayer } from '@/audio/VoicePlayer';
+import { EngineSound } from '@/audio/EngineSound';
+import { SaveGame } from '@/systems/SaveGame';
 import { drawFence } from '@/entities/Fence';
 import { Npc } from '@/entities/Npc';
 import { Plant } from '@/entities/Plant';
@@ -32,6 +34,7 @@ export class GameScene extends Phaser.Scene {
   private lastTap = 0;
   private water!: Phaser.GameObjects.TileSprite;
   private chatter!: NpcChatter;
+  private engine!: EngineSound;
 
   constructor() {
     super('Game');
@@ -60,8 +63,22 @@ export class GameScene extends Phaser.Scene {
       return null;
     });
 
-    const tier = TIERS[this.qm.save.vehicleTier] ?? TIERS[0];
+    const selected = Phaser.Math.Clamp(
+      this.qm.save.selectedTier ?? this.qm.save.vehicleTier,
+      0,
+      this.qm.save.vehicleTier
+    );
+    const tier = TIERS[selected] ?? TIERS[0];
     this.vehicle = new Vehicle(this, 600, 540, tier);
+    this.engine = new EngineSound(this);
+    this.engine.setProfile(tier.engine);
+    this.registry.set('tiers', { unlocked: this.qm.save.vehicleTier, selected });
+
+    const onSelect = ({ tier: t }: { tier: number }) => this.selectVehicle(t);
+    this.game.events.on(Ev.SelectVehicle, onSelect);
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
+      this.game.events.off(Ev.SelectVehicle, onSelect);
+    });
 
     this.delivery = new DeliveryDirector(this, this.sfx, this.voice, this.qm);
     this.delivery.setLaughCallback(() => this.cowDirector.laugh());
@@ -209,6 +226,10 @@ export class GameScene extends Phaser.Scene {
     if (this.time.now - this.lastTap < TUNING.tapDebounceMs) return;
     this.lastTap = this.time.now;
 
+    // tikken op de voertuig-picker (linkerrand) is geen wereld-tik
+    const tiers = this.registry.get('tiers') as { unlocked: number } | undefined;
+    if ((tiers?.unlocked ?? 0) > 0 && p.x < 82 && p.y > 72 && p.y < 560) return;
+
     const wx = p.worldX;
     const wy = p.worldY;
 
@@ -254,6 +275,7 @@ export class GameScene extends Phaser.Scene {
     this.cowDirector.update(time, delta, this.vehicle);
     if (!this.delivery.active) this.chatter.update(delta);
     this.water.tilePositionX += delta * 0.008;
+    this.engine.setMoving(this.vehicle.isMoving);
 
     // tik-wachtrij afwerken
     if (!this.delivery.active && !this.vehicle.busy && !this.scooping && this.queue.length) {
@@ -323,6 +345,18 @@ export class GameScene extends Phaser.Scene {
     }
   }
 
+  /** Speler kiest een vrijgespeeld voertuig via de picker links. */
+  private selectVehicle(t: number): void {
+    if (t < 0 || t > this.qm.save.vehicleTier || !TIERS[t]) return;
+    this.qm.save.selectedTier = t;
+    SaveGame.save(this.qm.save);
+    this.vehicle.setTier(TIERS[t]);
+    this.engine.setProfile(TIERS[t].engine);
+    this.sfx.honk();
+    this.registry.set('tiers', { unlocked: this.qm.save.vehicleTier, selected: t });
+    this.game.events.emit(Ev.TiersChanged, { unlocked: this.qm.save.vehicleTier, selected: t });
+  }
+
   setGiver(giver: Giver | null): void {
     for (const [name, npc] of this.npcs) {
       npc.setActiveGiver(name === giver);
@@ -350,6 +384,8 @@ export class GameScene extends Phaser.Scene {
       ease: 'Back.easeIn',
       onComplete: () => {
         v.setTier(tier);
+        this.engine.setProfile(tier.engine);
+        this.registry.set('tiers', { unlocked: tier.tier, selected: tier.tier });
         this.sfx.honk();
         this.tweens.add({
           targets: v,

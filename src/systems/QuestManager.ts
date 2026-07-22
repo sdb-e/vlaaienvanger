@@ -159,7 +159,9 @@ export class QuestManager {
     const tier = tierForStars(this.save.stars);
     if (tier.tier > this.save.vehicleTier) {
       this.save.vehicleTier = tier.tier;
+      this.save.selectedTier = tier.tier;
       SaveGame.save(this.save);
+      this.emit(Ev.TiersChanged, { unlocked: tier.tier, selected: tier.tier });
       this.awaiting = 'upgrade';
       this.host.playUpgrade(tier, () => this.showDialogue(upgradeLines(tier.name)));
     } else {

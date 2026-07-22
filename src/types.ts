@@ -34,6 +34,9 @@ export interface SaveData {
   version: 1;
   stars: number;
   questsCompleted: number;
+  /** hoogste vrijgespeelde tier */
   vehicleTier: number;
+  /** door de speler gekozen voertuig (≤ vehicleTier) */
+  selectedTier: number;
   highestTarget: number;
 }

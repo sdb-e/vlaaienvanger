@@ -7,6 +7,7 @@ const FRESH: SaveData = {
   stars: 0,
   questsCompleted: 0,
   vehicleTier: 0,
+  selectedTier: 0,
   highestTarget: 0,
 };
 
