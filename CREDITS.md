@@ -18,6 +18,8 @@
   `public/assets/vendor/lpc-trees/lpc-trees/` (CREDITS-bestand in het pack).
 - **Kruiwagen en waterlelies**: ["LPC C.Nilsson"](https://opengameart.org/content/lpc-cnilsson)
   door **Casper Nilsson**. Licentie: **CC-BY-SA 3.0 / GPL 3.0**.
+- **Trekkers**: ["Pixel Vehicle Pack"](https://kenney.nl/assets/pixel-vehicle-pack)
+  van **Kenney** — **CC0** (rode variant is een eigen kleuraanpassing).
 - **Houten emmer**: ["LPC Style Well"](https://opengameart.org/content/lpc-style-well)
   door **Xenodora** (op basis van LPC-assets van Lanea Zimmerman). Licentie: **CC-BY 3.0 / GPL 3.0**.
 - **Portretten**: eigen werk (AI-gegenereerd, nabewerkt), niet onder LPC-licentie.

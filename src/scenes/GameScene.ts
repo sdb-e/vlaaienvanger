@@ -27,6 +27,7 @@ export class GameScene extends Phaser.Scene {
   private npcs = new Map<Giver, Npc>();
   private arrow!: Phaser.GameObjects.Image;
   private queue: Vlaai[] = [];
+  private currentTarget: Vlaai | null = null;
   private scooping = false;
   private lastTap = 0;
   private water!: Phaser.GameObjects.TileSprite;
@@ -222,10 +223,30 @@ export class GameScene extends Phaser.Scene {
       return;
     }
 
-    // vrij rondrijden: tik op gras
+    // vrij rondrijden: tik op gras — een onderweg-zijnde vlaai wordt dan losgelaten
     if (this.queue.length === 0 && !this.scooping) {
+      this.releaseCurrentTarget();
       this.vehicle.driveTo(wx, wy);
     }
+  }
+
+  /** Geef de vlaai waar Ward naartoe reed weer vrij (ring weg, weer tikbaar). */
+  private releaseCurrentTarget(): void {
+    if (this.currentTarget) {
+      this.currentTarget.reserved = false;
+      this.currentTarget.hideRing();
+      this.currentTarget = null;
+    }
+  }
+
+  /** Maak de hele tikwachtrij leeg (bij start van het afleveren). */
+  private clearQueue(): void {
+    for (const v of this.queue) {
+      v.reserved = false;
+      v.hideRing();
+    }
+    this.queue = [];
+    this.releaseCurrentTarget();
   }
 
   update(time: number, delta: number): void {
@@ -235,15 +256,17 @@ export class GameScene extends Phaser.Scene {
     this.water.tilePositionX += delta * 0.008;
 
     // tik-wachtrij afwerken
-    if (!this.vehicle.busy && !this.scooping && this.queue.length) {
+    if (!this.delivery.active && !this.vehicle.busy && !this.scooping && this.queue.length) {
       const v = this.queue.shift()!;
       if (v.active) {
+        this.currentTarget = v;
         this.vehicle.driveTo(v.x, v.y, () => this.scoop(v));
       }
     }
 
     // moestuin binnenrijden met vlaaien in de kar → afleveren
     if (!this.delivery.active && this.qm.canStartDelivery() && this.vehicle.x > MEADOW.right + 80) {
+      this.clearQueue();
       this.delivery.start(this.plants, this.vehicle);
     }
   }
@@ -263,6 +286,7 @@ export class GameScene extends Phaser.Scene {
       onComplete: () => {
         this.cowDirector.removeVlaai(v);
         v.destroy();
+        if (this.currentTarget === v) this.currentTarget = null;
         this.vehicle.wobble();
         this.sfx.plop();
         const n = this.qm.collectOne();

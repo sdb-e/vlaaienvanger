@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import { AMBIENT_CHATS, BABBLE_PROFILES, type ChatLine } from '@/config/chats';
 import { WORLD } from '@/config/gameConfig';
+import { Ev } from '@/events';
 import type { Npc } from '@/entities/Npc';
 import type { SfxSynth } from '@/audio/SfxSynth';
 import type { Giver } from '@/types';
@@ -22,12 +23,20 @@ export class NpcChatter {
     private sfx: SfxSynth
   ) {
     this.nextIn = Phaser.Math.Between(4000, 9000);
+    // na elk quest-dialoog (Ward staat dan meestal bij de familie) snel een praatje
+    const onDialogueDone = () => {
+      this.nextIn = Math.min(this.nextIn, 2200);
+    };
+    scene.game.events.on(Ev.DialogueDone, onDialogueDone);
+    scene.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
+      scene.game.events.off(Ev.DialogueDone, onDialogueDone);
+    });
   }
 
   /** Staat minstens één NPC (ruim) in beeld? Anders kletst niemand — Ward moet het kunnen zien. */
   private npcsInView(): boolean {
     const view = this.scene.cameras.main.worldView;
-    const margin = 60;
+    const margin = 220;
     for (const npc of this.npcs.values()) {
       if (
         npc.x > view.left - margin &&

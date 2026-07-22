@@ -31,7 +31,7 @@ export const TUNING = {
   plantTapRadius: 100,
   queueCap: 3,
   tapDebounceMs: 150,
-  idleBetweenQuestsMs: 6000,
+  idleBetweenQuestsMs: 9500,
   firstQuestDelayMs: 5000,
   poopMinMs: 8000,
   poopMaxMs: 20000,
