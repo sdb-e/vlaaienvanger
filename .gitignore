@@ -1,0 +1,4 @@
+node_modules/
+dist/
+# bronpakketten (zips en uitgepakte LPC-packs); de gebruikte crops staan in public/assets/vendor
+vendor-src/
